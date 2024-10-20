@@ -3,7 +3,6 @@
 	This problem requires you to implement a basic BFS algorithm
 */
 
-//I AM NOT DONE
 use std::collections::VecDeque;
 
 // Define a graph
@@ -27,14 +26,36 @@ impl Graph {
 
     // Perform a breadth-first search on the graph, return the order of visited nodes
     fn bfs_with_return(&self, start: usize) -> Vec<usize> {
-        
-		//TODO
-
+        // 初始化一个队列用于BFS
+        let mut queue = VecDeque::new();
+        // 用于记录访问顺序的向量
         let mut visit_order = vec![];
+        // 创建一个访问标记数组以避免重复访问
+        let mut visited = vec![false; self.adj.len()];
+
+        // 将起始节点标记为访问，并加入队列
+        visited[start] = true;
+        queue.push_back(start);
+
+        // 开始BFS循环，直到队列为空
+        while let Some(node) = queue.pop_front() {
+            // 记录当前节点的访问顺序
+            visit_order.push(node);
+
+            // 遍历所有邻居节点
+            for &neighbor in &self.adj[node] {
+                // 如果邻居节点未被访问，则标记并加入队列
+                if !visited[neighbor] {
+                    visited[neighbor] = true;
+                    queue.push_back(neighbor);
+                }
+            }
+        }
+
+        // 返回访问顺序
         visit_order
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -84,4 +105,3 @@ mod tests {
         assert_eq!(visited_order, vec![0]);
     }
 }
-

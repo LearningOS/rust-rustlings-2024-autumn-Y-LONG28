@@ -3,7 +3,6 @@
 	This problem requires you to implement a basic DFS traversal
 */
 
-// I AM NOT DONE
 use std::collections::HashSet;
 
 struct Graph {
@@ -11,25 +10,39 @@ struct Graph {
 }
 
 impl Graph {
+    // 创建一个包含 n 个节点的新图
     fn new(n: usize) -> Self {
         Graph {
             adj: vec![vec![]; n],
         }
     }
 
+    // 添加一条边，连接 src 和 dest 节点
     fn add_edge(&mut self, src: usize, dest: usize) {
         self.adj[src].push(dest);
         self.adj[dest].push(src); 
     }
 
+    // 递归地执行 DFS，记录访问顺序
     fn dfs_util(&self, v: usize, visited: &mut HashSet<usize>, visit_order: &mut Vec<usize>) {
-        //TODO
+        // 将当前节点标记为已访问
+        visited.insert(v);
+        // 记录访问顺序
+        visit_order.push(v);
+
+        // 遍历与当前节点相连的所有邻居节点
+        for &neighbor in &self.adj[v] {
+            // 如果邻居节点未被访问，递归调用 dfs_util
+            if !visited.contains(&neighbor) {
+                self.dfs_util(neighbor, visited, visit_order);
+            }
+        }
     }
 
-    // Perform a depth-first search on the graph, return the order of visited nodes
+    // 执行深度优先搜索，并返回访问顺序
     fn dfs(&self, start: usize) -> Vec<usize> {
-        let mut visited = HashSet::new();
-        let mut visit_order = Vec::new(); 
+        let mut visited = HashSet::new(); // 创建一个集合记录已访问的节点
+        let mut visit_order = Vec::new(); // 记录访问顺序
         self.dfs_util(start, &mut visited, &mut visit_order);
         visit_order
     }
@@ -75,4 +88,3 @@ mod tests {
         assert_eq!(visit_order_disconnected, vec![3, 4]); 
     }
 }
-

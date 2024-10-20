@@ -2,7 +2,7 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
+
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -69,15 +69,64 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+    
+    pub fn remove(&mut self, index: i32) -> Option<T> {
+        if index < 0 || index >= self.length as i32 {
+            return None;
         }
-	}
+
+        let mut current = self.start;
+        let mut prev: Option<NonNull<Node<T>>> = None;
+
+        for _ in 0..index {
+            prev = current;
+            current = unsafe { (*current.unwrap().as_ptr()).next };
+        }
+
+        if let Some(current_ptr) = current {
+            if let Some(prev_ptr) = prev {
+                unsafe {
+                    (*prev_ptr.as_ptr()).next = (*current_ptr.as_ptr()).next;
+                }
+            } else {
+                self.start = unsafe { (*current_ptr.as_ptr()).next };
+            }
+
+            if self.end == current {
+                self.end = prev;
+            }
+
+            self.length -= 1;
+
+            return Some(unsafe { Box::from_raw(current_ptr.as_ptr()).val });
+        }
+
+        None
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.length == 0
+    }
+}
+
+impl<T: Clone + Ord> LinkedList<T> {
+    pub fn merge(mut list_a: LinkedList<T>, mut list_b: LinkedList<T>) -> Self {
+        let mut merged_list = LinkedList::new();
+
+        while !list_a.is_empty() || !list_b.is_empty() {
+            if list_a.is_empty() {
+                merged_list.add(list_b.remove(0).unwrap());
+            } else if list_b.is_empty() {
+                merged_list.add(list_a.remove(0).unwrap());
+            } else if list_a.get(0).unwrap() <= list_b.get(0).unwrap() {
+                merged_list.add(list_a.remove(0).unwrap());
+            } else {
+                merged_list.add(list_b.remove(0).unwrap());
+            }
+        }
+
+        merged_list
+    }
 }
 
 impl<T> Display for LinkedList<T>
